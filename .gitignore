@@ -1,0 +1,27 @@
+# Personal / private applicant data
+PROFILE.md
+UWUnofficialTranscript.pdf
+resume.tex
+resume.pdf
+
+# Session / application run state (may contain personal details)
+handoff.json
+session_report.json
+reports/
+
+# Secrets / local env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
