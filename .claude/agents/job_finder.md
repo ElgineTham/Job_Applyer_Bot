@@ -48,9 +48,15 @@ when finished. Close only tabs you created.
 
 ## Procedure
 
-0. **Clear the queue on startup.** Before anything else, run
-   `python3 /Users/elginetham/Documents/JobBot/jobqueue.py reset`.
-   Every run starts from zero. Do not carry entries over from a previous run.
+0. **Clear the queue and the results on startup.** Before anything else, run both:
+   ```bash
+   python3 /Users/elginetham/Documents/JobBot/jobqueue.py reset
+   python3 /Users/elginetham/Documents/JobBot/passed.py reset
+   ```
+   Every run starts from zero. Do not carry entries over from a previous run. This is
+   the only place `ats_passed.json` is ever cleared: the ats_scorer agents only add to
+   it, and several of them may run at the same time. Never touch `ats_passed.json`
+   otherwise.
 
    `job_links.json` is a FIFO queue. You push jobs onto the back; ats_scorer pops them
    off the front while you work. Never write the file directly with Write or Edit. Only

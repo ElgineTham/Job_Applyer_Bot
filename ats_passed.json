@@ -1,1 +1,297 @@
-{ "updated_at": "2026-11-04T02:53:05Z", "threshold": 75, "count": 0, "jobs": [] }
+{
+  "updated_at": "2026-11-05T00:37:50Z",
+  "threshold": 75,
+  "count": 12,
+  "jobs": [
+    {
+      "jobright_id": "6aea3fbb913589212b1f4fbc",
+      "title": "Software Development Engineer (Embedded Systems) Early Career - 2027 (US)",
+      "company": "Amazon",
+      "original_post_url": "https://www.amazon.jobs/en/jobs/10595839/software-development-engineer-embedded-systems-early-career-2027-us?jr_id=6aea3fbb913589212b1f4fbc",
+      "ats_score": 91,
+      "breakdown": {
+        "skills": 90,
+        "title": 100,
+        "education": 100,
+        "experience": 100,
+        "responsibilities": 80
+      },
+      "matched": [
+        "general-purpose language (Java/Python/C++/C#/Go/Rust/TypeScript) (bullet: Python)",
+        "data structures/algorithms/object-oriented design (bullet)",
+        "AI-assisted development tools (skills: Cursor, Claude Code)",
+        "agile (bullet)",
+        "CI/CD (skills)",
+        "AI tools/cloud platforms/database systems/open source/version control/debugging menu (bullet: debugging; skills: AWS, SQL databases; related: AI tools ← Claude Code/Cursor, cloud platforms ← AWS, version control systems ← Git, troubleshooting ← debugging)"
+      ],
+      "missing_all": [
+        "SDLC",
+        "NoSQL",
+        "AI tools for development productivity",
+        "cloud platforms",
+        "version control systems",
+        "troubleshooting",
+        "operational excellence (on-call, monitoring)",
+        "production troubleshooting",
+        "open-source contributions",
+        "problem-solving",
+        "analytical skills",
+        "written and verbal communication skills"
+      ],
+      "missing_keywords": "SDLC, NoSQL, AI tools for development productivity, cloud platforms, version control systems, operational excellence (on-call, monitoring), production troubleshooting, open-source contributions, problem-solving, analytical skills, written and verbal communication skills"
+    },
+    {
+      "jobright_id": "6a95e03ecabc9f6703e1a824",
+      "title": "Software Engineer, 2027 New Grad",
+      "company": "Whatnot",
+      "original_post_url": "https://jobs.ashbyhq.com/whatnot/29bad846-de60-4be7-a222-69b97e044930/application?jr_id=6a95e03ecabc9f6703e1a824",
+      "ats_score": 87,
+      "breakdown": {
+        "skills": null,
+        "title": 100,
+        "education": 100,
+        "experience": 100,
+        "responsibilities": 60
+      },
+      "matched": [
+        "scalable systems (related: priority-queued WebSocket telemetry pipeline)"
+      ],
+      "missing_all": [
+        "scalable systems",
+        "product instincts",
+        "product decision-making",
+        "shipping products fast"
+      ],
+      "missing_keywords": "scalable systems, product instincts, product decision-making, shipping products fast"
+    },
+    {
+      "jobright_id": "6aebb6bdf40efa43f4a1a1ba",
+      "title": "Software Test Engineer",
+      "company": "Abbott",
+      "original_post_url": "https://www.jobs.abbott/us/en/job/ABLAUS31165820ENUSEXTERNAL/software-test-engineer?jr_id=6aebb6bdf40efa43f4a1a1ba",
+      "ats_score": 86,
+      "breakdown": {
+        "skills": 92,
+        "title": 0,
+        "education": 100,
+        "experience": 100,
+        "responsibilities": 70
+      },
+      "matched": [
+        "Python/JavaScript/TypeScript (bullet: Python)",
+        "test automation tools (PyTest, Jest, Playwright, REST Assured) (bullet: Playwright)",
+        "Git/version control (bullet)",
+        "CI/CD (GitHub Actions, Azure Pipelines) (skills)",
+        "cloud concepts/containerization (Docker) (skills: Docker; related: cloud concepts ← AWS)",
+        "privacy/compliance frameworks (HIPAA, GDPR) (skills: privacy, security)"
+      ],
+      "missing_all": [
+        "regulated medical device standards (FDA, ISO 13485, IEC 62304)",
+        "cloud concepts",
+        "healthcare/biomedical interest",
+        "documentation skills",
+        "risk analysis"
+      ],
+      "missing_keywords": "regulated medical device standards (FDA, ISO 13485, IEC 62304), cloud concepts, healthcare/biomedical interest, documentation skills, risk analysis"
+    },
+    {
+      "jobright_id": "6ac5936c4ac55253f5d7746f",
+      "title": "Field Application Engineer",
+      "company": "FieldAI",
+      "original_post_url": "https://jobs.lever.co/field-ai/3a115140-cbee-4d96-b61d-7403596b77ca/apply?jr_id=6ac5936c4ac55253f5d7746f",
+      "ats_score": 86,
+      "breakdown": {
+        "skills": 94,
+        "title": 0,
+        "education": 100,
+        "experience": 100,
+        "responsibilities": 50
+      },
+      "matched": [
+        "Python/C++ scripting (bullet)",
+        "robotics hardware (drones, quadrupeds, humanoids) (bullet: embedded robot systems)",
+        "electronics, sensors, robotic subsystems (related: embedded robot systems)"
+      ],
+      "missing_all": [
+        "electronics, sensors, robotic subsystems",
+        "client-facing demo experience",
+        "field testing experience",
+        "drones",
+        "quadrupeds",
+        "humanoids"
+      ],
+      "missing_keywords": "electronics, sensors, robotic subsystems, client-facing demo experience, field testing experience"
+    },
+    {
+      "jobright_id": "6ae63e0cc3139b475b5bc4ce",
+      "title": "Senior Software Engineer",
+      "company": "Onto Innovation",
+      "original_post_url": "https://onto.wd1.myworkdayjobs.com/onto_careers/job/Wilmington-MA-Upton/Senior-Software-Engineer_R-6530?jr_id=6ae63e0cc3139b475b5bc4ce",
+      "ats_score": 85,
+      "breakdown": {
+        "skills": 84,
+        "title": 100,
+        "education": 100,
+        "experience": 100,
+        "responsibilities": 60
+      },
+      "matched": [
+        "Python/MATLAB (bullet: Python)",
+        "C++/C#/Java (bullet: C++)",
+        "AI coding agents (Copilot, Cursor, Aider) (skills: Cursor)",
+        "Agile/Scrum/Kanban (bullet: Agile)",
+        "version control (bullet: Git)",
+        "CI/CD (skills)",
+        "embedded systems/hardware protocols/real-time (bullet: embedded robot systems, real-time)"
+      ],
+      "missing_all": [
+        "multi-threaded software debugging",
+        "semiconductor inspection/machine vision experience",
+        "cross-subsystem issue diagnosis",
+        "hardware protocols"
+      ],
+      "missing_keywords": "multi-threaded software debugging, semiconductor inspection/machine vision experience, cross-subsystem issue diagnosis"
+    },
+    {
+      "jobright_id": "6aea82e04f991d64376ce983",
+      "title": "Forward Deployed Engineer, 2027 Graduate",
+      "company": "Endeavor",
+      "original_post_url": "https://jobs.ashbyhq.com/endeavorai/00a6bb4f-fccb-4948-a2e9-71b736c2b0b4/application?jr_id=6aea82e04f991d64376ce983",
+      "ats_score": 85,
+      "breakdown": {
+        "skills": null,
+        "title": 80,
+        "education": 100,
+        "experience": 100,
+        "responsibilities": 65
+      },
+      "matched": [
+        "Python/C++/TypeScript/JavaScript (bullet)"
+      ],
+      "missing_all": [
+        "customer-facing experience",
+        "end-to-end project ownership"
+      ],
+      "missing_keywords": "customer-facing experience, end-to-end project ownership"
+    },
+    {
+      "jobright_id": "6a7a5113a26ccc369f83dc9e",
+      "title": "Software Engineer Graduate (E-Commerce) - 2027 Start",
+      "company": "TikTok USDS Joint Venture",
+      "original_post_url": "https://careers.tiktokusds.com/usds/position/7671411235325397301/detail?jr_id=6a7a5113a26ccc369f83dc9e",
+      "ats_score": 83,
+      "breakdown": {
+        "skills": 84,
+        "title": 100,
+        "education": 100,
+        "experience": 100,
+        "responsibilities": 45
+      },
+      "matched": [
+        "big data frameworks (Hadoop, Flink, Spark, Kafka, Hive, HBase, Redis, RocksDB) (skills: Kafka)",
+        "algorithms (bullet)",
+        "data structures (bullet)",
+        "software design (related: modular Angular site design)",
+        "large-scale machine learning infrastructure (related: PyTorch data collection pipeline)"
+      ],
+      "missing_all": [
+        "software design",
+        "large-scale machine learning infrastructure",
+        "risk control/governance domain experience",
+        "petabyte-level data processing"
+      ],
+      "missing_keywords": "software design, large-scale machine learning infrastructure, risk control/governance domain experience, petabyte-level data processing"
+    },
+    {
+      "jobright_id": "6aeb859ca0b134121d99b92e",
+      "title": "AI Business Development Analyst",
+      "company": "Houlihan Lokey",
+      "original_post_url": "https://hl.wd1.myworkdayjobs.com/external/job/Atlanta-GA-USA/AI-Business-Development-Analyst_R3556-2?jr_id=6aeb859ca0b134121d99b92e",
+      "ats_score": 83,
+      "breakdown": {
+        "skills": 88,
+        "title": 0,
+        "education": 100,
+        "experience": 100,
+        "responsibilities": 60
+      },
+      "matched": [
+        "artificial intelligence (bullet)",
+        "machine learning (related: PyTorch)",
+        "data analysis (related: Pandas/NumPy)",
+        "Python (bullet)",
+        "data science libraries (Pandas, NumPy) (skills)",
+        "large language models (related: LangChain)",
+        "data structures (bullet)",
+        "algorithms (bullet)"
+      ],
+      "missing_all": [
+        "machine learning",
+        "data analysis",
+        "large language models (e.g., Gemini)",
+        "finance/investment banking interest"
+      ],
+      "missing_keywords": "machine learning, data analysis, large language models (e.g., Gemini), finance/investment banking interest"
+    },
+    {
+      "jobright_id": "6a0fa3f580bf0430c76357ef",
+      "title": "Machine Learning Engineer - College Graduate",
+      "company": "Qualcomm",
+      "original_post_url": "https://careers.qualcomm.com/careers/job/446717859953?hl=en-US&domain=qualcomm.com&source=APPLICANT_SOURCE-6-2&jr_id=6a0fa3f580bf0430c76357ef",
+      "ats_score": 78,
+      "breakdown": {
+        "skills": 74,
+        "title": 60,
+        "education": 100,
+        "experience": 100,
+        "responsibilities": 80
+      },
+      "matched": [
+        "Python (bullet)",
+        "object-oriented design (skills)",
+        "ML frameworks (PyTorch) (bullet)",
+        "deep learning (related: PyTorch)",
+        "Generative AI (related: LangChain)",
+        "neural network model optimization and on-target deployment (related: TensorRT)",
+        "C/C++ (bullet)",
+        "embedded software (bullet)"
+      ],
+      "missing_all": [
+        "deep learning",
+        "NPUs / ML accelerators",
+        "Android programming",
+        "Generative AI",
+        "neural network model optimization and on-target deployment"
+      ],
+      "missing_keywords": "deep learning, NPUs / ML accelerators, Android programming, Generative AI, neural network model optimization and on-target deployment"
+    },
+    {
+      "jobright_id": "6a798c367b3417772aded077",
+      "title": "Software Engineer Graduate (Search) - 2027 Start",
+      "company": "TikTok USDS Joint Venture",
+      "original_post_url": "https://careers.tiktokusds.com/usds/position/7671411986861721861/detail?jr_id=6a798c367b3417772aded077",
+      "ats_score": 76,
+      "breakdown": {
+        "skills": 71,
+        "title": 100,
+        "education": 100,
+        "experience": 100,
+        "responsibilities": 55
+      },
+      "matched": [
+        "C/C++/Python/Java/Golang (bullet)",
+        "machine learning/deep learning/backend/large-scale systems/data science/full-stack (bullet: backend, full-stack; related: machine learning ← PyTorch MLP, deep learning ← PyTorch, large-scale systems ← 1M-point data pipeline, data science ← Pandas/NumPy)"
+      ],
+      "missing_all": [
+        "Big Data Frameworks (Hadoop, Spark, Flink)",
+        "machine learning",
+        "deep learning",
+        "large-scale systems",
+        "large-scale consumer-facing services experience",
+        "search/recommendation/ranking/ads domain experience",
+        "data science"
+      ],
+      "missing_keywords": "Big Data Frameworks (Hadoop, Spark, Flink), machine learning, deep learning, large-scale systems, large-scale consumer-facing services experience, search/recommendation/ranking/ads domain experience"
+    }
+  ]
+}

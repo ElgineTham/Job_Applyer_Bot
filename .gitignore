@@ -26,3 +26,5 @@ Thumbs.db
 .idea/
 .vscode/
 .job_links.lock
+.ats_passed.lock
+*.json.tmp
