@@ -42,7 +42,7 @@ All paths are in `/Users/elginetham/Documents/JobBot/`.
 Use the Claude in Chrome tools (`mcp__claude-in-chrome__*`). Load them in one ToolSearch
 call first:
 
-`select:mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__javascript_tool,mcp__claude-in-chrome__get_page_text,mcp__claude-in-chrome__read_page,mcp__claude-in-chrome__find,mcp__claude-in-chrome__tabs_create_mcp,mcp__claude-in-chrome__tabs_close_mcp`
+`select:mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__javascript_tool,mcp__claude-in-chrome__get_page_text,mcp__claude-in-chrome__read_page,mcp__claude-in-chrome__find,mcp__claude-in-chrome__tabs_create_mcp,mcp__claude-in-chrome__tabs_close_mcp,mcp__claude-in-chrome__browser_batch`
 
 Start with `tabs_context_mcp` (createIfEmpty true). Open **one** new tab of your own with
 `tabs_create_mcp` and do all reading in it. job_finder may be running in another tab at
@@ -61,7 +61,15 @@ finish.
    Do **not** clear `ats_passed.json` on startup. Other scorers may already be saving
    results to it.
 
-1. **Pop the next job.** Run `python3 /Users/elginetham/Documents/JobBot/jobqueue.py pop`.
+1. **Pop the next job.** Run `python3 /Users/elginetham/Documents/JobBot/jobqueue.py pop`
+   **exactly once**.
+   - **One job at a time.** Pop a single job, then finish it completely (read, gates,
+     score, save, pause in step 7) before you pop again. Never run `pop` in a loop,
+     never pop several jobs to look ahead or plan, and never hold more than one popped
+     job. Every pop removes the job from the queue for good: jobs you pop but do not
+     score are lost to the pipeline, and other scorers running in parallel can no
+     longer take them. To see how many jobs are waiting, use `jobqueue.py peek`, which
+     removes nothing.
    - If it prints a job, go to step 2 with it.
    - If it prints nothing, the queue is empty. Run `sleep 10` and pop again. If the
      queue stays empty for **1 minute** (6 empty pops in a row), go to step 8.
@@ -71,13 +79,25 @@ finish.
    - If `original_post_url` is null, record it as `no_url` (with its note) for the final
      report and go to step 7.
    - Navigate your tab to `original_post_url`. Read the **whole page's text** with
-     `javascript_tool`: wait about 2 seconds for it to render, then return
-     `document.body.innerText`. Do not rely on `get_page_text` or `read_page` alone:
-     `get_page_text` returns only one section of the page (on IBM it returned either the
-     description or the key-details box, never both), and `read_page` cuts long
-     paragraphs off. Sponsorship and work-authorization lines are often in a separate
-     "details" or "other information" section, so you must see all of it. Use
-     `get_page_text` only if `javascript_tool` fails.
+     `javascript_tool`, **in pieces**. `javascript_tool` cuts off long results at about
+     1,000 characters, and a job page is usually 5,000–15,000, so one call is never
+     enough:
+     1. Wait about 2 seconds for the page to render, then store the text in the page and
+        return only its length:
+        `await new Promise(r => setTimeout(r, 2000)); window.__jd = document.body.innerText.replace(/\n\s*\n+/g, '\n'); window.__jd.length`
+     2. Read it back in **900-character slices**, one call each:
+        `window.__jd.slice(0, 900)`, then `window.__jd.slice(900, 1800)`, and so on.
+        Keep going until a slice's end reaches the stored length. Slices can be read in
+        one `browser_batch` call when the tool is available.
+     3. Before scoring, check that your slices cover the whole length. If any slice came
+        back cut off (shorter than 900 characters but not the last one, or marked
+        truncated), re-read that range in smaller pieces.
+     Do not rely on `get_page_text` or `read_page` alone: `get_page_text` returns only
+     one section of the page on some sites (on IBM it returned either the description
+     or the key-details box, never both), and `read_page` cuts long paragraphs off.
+     Sponsorship and work-authorization lines are often in a separate "details" or
+     "other information" section near the end, so you must read every slice. Use
+     `get_page_text` only if `javascript_tool` fails, and say so in the report.
    - Many links point at the application form, not the description. If the page text
      has no real description (no responsibilities or qualifications, only form fields),
      try the description page once, using these rules:
@@ -240,7 +260,9 @@ finish.
       **Matching rules.** Case does not matter, and clear synonyms count as the term
       itself. A match must use the term in the same sense as the JD: a shared word stem
       is not enough ("optimized routes" does not show "optimization" of ML models;
-      "security" in a list does not show "security best practices for REST").
+      "security" in a list does not show "security best practices for REST"). A named
+      method or process needs its own name or acronym: an agile workflow, Git, or code
+      reviews do not show "SDLC"; "testing" does not show "regression testing".
 
       Score = `sum(weight × credit) / sum(weight) × 100`.
 
@@ -263,8 +285,20 @@ finish.
       - **Experience level:** **100** for new grad, entry level, or 0–1 years; **80** for
         "1–2 years", or if the level is unstated but the work reads mid level; **0** for
         anything else (e.g. senior, staff, or lead work with no years stated).
-      - **Responsibilities:** 0–100 for how closely the main day-to-day responsibilities
-        match what the resume's experience and projects show.
+      - **Responsibilities:** can Elgine do this job's day-to-day work, judging from
+        what the resume's experience and projects show? Use these steps so the score is
+        consistent between runs:
+        1. **Summarize** the responsibilities and role summary into **3–6 core duties**,
+           one short line each (e.g. "build REST services that integrate with Kafka").
+        2. **Judge each duty:**
+           - **1.0 (done it):** the resume shows the same kind of work.
+           - **0.5 (could do it):** the resume shows adjacent work Elgine could ramp up
+             from (e.g. REST APIs → microservices, OpenCV pipelines → image
+             segmentation).
+           - **0 (no basis):** nothing related on the resume.
+        3. **Score** = the average of the duty scores × 100, rounded.
+        In the report, list each duty with its verdict and the resume evidence (or
+        "none"), so anyone can check the reasoning.
    f. **Combine.**
       `ats_score = round(0.70 × skills + 0.05 × title + 0.05 × education + 0.10 × experience + 0.10 × responsibilities)`
 
@@ -305,26 +339,32 @@ finish.
       - Lists of **specific** tool options ("public cloud (AWS, Azure, GCP)") are not
         split: once one option is covered, the others are not missing.
 
-      **Broad terms from the responsibilities (missing keywords only).** Broad terms that
-      appear only in the responsibilities or role summary are not scored in 4b, and that
-      stays true: they never change `skills` or `ats_score`. But check each one against
-      the resume for the missing list:
-      - If the resume does not contain the phrase (or its standard acronym) but **shows
-        the work through related evidence** (computer vision ← OpenCV, machine learning ←
-        PyTorch, image processing ← OpenCV), it is a **responsibility term** and goes into
-        the missing list.
-      - If the resume has **no evidence** for it (e.g. optics, GPUs with no GPU work), leave
-        it out entirely. Do not add it to `missing_all` either.
+      **Responsibility terms.** Read the responsibilities and role summary ("What you'll
+      do", "Responsibilities", "About the role") for anything the resume does not state
+      word for word. These are **responsibility terms**:
+      - **Specific tools and methods** named **only** in the responsibilities (e.g. Kafka,
+        regression testing, cert-manager) that the resume lacks. They are still scored
+        as required hard skills in 4b; this rule only decides where they sit in the
+        missing list.
+      - **Broad terms** named only in the responsibilities (e.g. computer vision, optics,
+        GPUs, image processing) that the resume does not state. They are **not** scored in
+        4b and never change `skills` or `ats_score`. List them **whether or not** the
+        resume shows related work.
+      - A term that also appears in the qualifications is a qualification item (groups
+        1–3 below), not a responsibility term.
       - Skip filler and generic concepts ("scale", "reliability", "performance", "data
         flow") as usual.
       - Do not repeat a term that is already in the missing list from another rule.
+      - At most **4** responsibility terms go into `missing_keywords` (specific tools
+        before broad terms, then by how often and how prominently the JD mentions them).
+        All of them go into `missing_all`.
 
       Order them in these groups, and within each group by how often and how prominently
       the JD mentions them:
-      1. required hard skills
-      2. preferred hard skills
+      1. required hard skills from the qualifications
+      2. preferred hard skills from the qualifications
       3. flagged examples (required lists before preferred lists)
-      4. responsibility terms
+      4. responsibility terms (at most 4 in `missing_keywords`)
       5. experience, contribution, and interest items (required before preferred)
       6. soft skills, always **last** (required before preferred)
       Keep the top **12 at most**; everything else stays in `missing_all`. Write them as one comma-separated string, e.g.
@@ -333,6 +373,19 @@ finish.
       responsibility terms, never a
       degree, GPA, years of experience, certification, clearance, coursework, or
       publication.
+
+      **Coverage check (do this before saving).** Go through the JD's required and
+      preferred qualifications **line by line**, including each item of every list and
+      menu. Every skill, method, soft skill, or experience item named there must end up
+      in exactly one of these places:
+      - `matched` (the resume contains it, by the rules above), or
+      - `missing_all` (it does not), or
+      - a short **excluded** line in your report giving the reason (filler, coursework,
+        degree, age, years of experience, no evidence for a broad-list example).
+      An item that is in none of them was skipped by mistake: add it before saving.
+      Preferred items are easy to drop because they do not move the score much, so
+      check them as carefully as required ones (e.g. "basic understanding of software
+      development lifecycle (SDLC)" must appear as `SDLC` in `matched` or `missing_all`).
 
 5. **Record the result.** If `ats_score >= 75`, save the job right away, so nothing is
    lost if the run stops. Pass **one job object** (the format in step 6) to `passed.py`
@@ -379,12 +432,15 @@ finish.
    - the passing jobs, highest score first: score, company, title
    - the jobs below 75: score, company, title
    - the knocked-out jobs: company, title, which gate, and the quote
+   - for each scored job, the qualification items you excluded in the coverage check
+     (step 4g) and why, one short line per job
    - the `no_url`, `closed`, and `blocked` jobs, with reasons
    - the path to `ats_passed.json`
 
 ## Rules
 
-- Never touch `job_links.json` except through `jobqueue.py pop`.
+- Never touch `job_links.json` except through `jobqueue.py pop` (one job, then score it
+  before the next pop) and `jobqueue.py peek`.
 - Never touch `ats_passed.json` except through `passed.py add`. Never reset it.
 - Never click Apply, fill a field, submit anything, or sign in.
 - Never score a job from Jobright's text or from memory. Score only from the description

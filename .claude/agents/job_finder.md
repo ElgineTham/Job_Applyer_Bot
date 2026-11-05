@@ -62,8 +62,13 @@ when finished. Close only tabs you created.
    off the front while you work. Never write the file directly with Write or Edit. Only
    change it through `jobqueue.py`, which locks the file so the two agents never
    overwrite each other. Keep your own in-memory list of every `jobright_id` you have
-   pushed this run (`seen_ids`). Jobs disappear from the file once they are popped, so
-   the file cannot tell you what you already collected.
+   pushed or skipped this run (`seen_ids`). Jobs disappear from the file once they are
+   popped, so the file cannot tell you what you already collected.
+
+   **History.** `jobqueue.py` also keeps `job_history.json`, a permanent record of every
+   job ever pushed, across all runs. `reset` does **not** clear it. Use it to skip jobs
+   collected in earlier runs (step 3). Never write `job_history.json` yourself, and
+   never run `jobqueue.py history-reset` unless Elgine asks for it.
 
 1. **Open the feed.** Navigate the feed tab to `https://jobright.ai/jobs/recommend`. Wait
    for cards to render. Do not change any filters.
@@ -82,6 +87,11 @@ when finished. Close only tabs you created.
    step 5.
 
 3. **Process each new card.** For each card whose `jobright_id` is not in `seen_ids`:
+   0. **Check the history first.** Run
+      `python3 /Users/elginetham/Documents/JobBot/jobqueue.py seen <id>`. If it prints
+      `seen`, the job was collected in an earlier run: add the id to `seen_ids`, count
+      it as **skipped (already collected)**, and move on to the next card without
+      opening its detail page. If it prints `new`, continue with step a.
    a. In the **detail tab**, navigate to `https://jobright.ai/jobs/info/<id>` and call
       `read_page` with `filter: "interactive"`. Do both in one `browser_batch` call when
       the tool is available.
@@ -100,6 +110,12 @@ when finished. Close only tabs you created.
       Escape any single quote in the JSON as `'\''`. Add the id to `seen_ids`. Push each
       job as soon as you read it, not at the end of the batch: ats_scorer stops after
       1 minute with an empty queue.
+      - `push` prints the queue size when the job was added. If it prints
+        `duplicate of <other id>`, the same posting is already in the history under
+        another Jobright id (its original post URL, minus tracking parameters, matches;
+        or, with no URL, the same company and title). The job was **not** queued. Count
+        it as **skipped (duplicate posting)** and note both ids for the report. Never
+        use `push --force`; that is only for Elgine to re-queue a job by hand.
    e. Move on to the next new card.
    Never touch the feed tab during this step. It stays exactly where it was.
 
@@ -124,11 +140,11 @@ when finished. Close only tabs you created.
 
 7. **Finish.** Every job is already pushed, so there is nothing to save. Close both
    tabs. Report back with:
-   - total jobs collected
+   - total new jobs collected (pushed to the queue)
+   - how many were skipped as already collected in an earlier run (`seen`)
+   - how many were skipped as duplicate postings, with each pair of Jobright ids
    - how many had an Original Job Post URL, and how many were null (with reasons)
    - how many are missing a title or company
-   - any jobs that share the same `original_post_url` under different Jobright IDs (all
-     of them are still pushed)
    - number of scroll steps, and how many times the overlap check had to scroll back
    - the path to `job_links.json` (jobs ats_scorer has not popped yet are still in it)
 

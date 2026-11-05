@@ -8,6 +8,7 @@ Usage:
   { ...job json... }
   EOF
   python3 passed.py count              # print how many jobs are saved
+  python3 passed.py add --any-score ... # test runs only: also accept scores below 75
 
 `add` keeps jobs sorted by ats_score (highest first), updates count and updated_at,
 and refuses a job below the threshold or without jobright_id / ats_score.
@@ -51,6 +52,11 @@ def save(data):
     os.replace(tmp, PASSED)  # atomic: readers never see a half-written file
 
 
+ANY_SCORE = "--any-score" in sys.argv  # test runs only: accept scores below the threshold
+if ANY_SCORE:
+    sys.argv.remove("--any-score")
+
+
 def read_job():
     raw = sys.argv[2] if len(sys.argv) > 2 and sys.argv[2] != "-" else sys.stdin.read()
     job = json.loads(raw)
@@ -58,7 +64,7 @@ def read_job():
         sys.exit("error: job JSON needs a jobright_id")
     if not isinstance(job.get("ats_score"), (int, float)):
         sys.exit("error: job JSON needs a numeric ats_score")
-    if job["ats_score"] < THRESHOLD:
+    if job["ats_score"] < THRESHOLD and not ANY_SCORE:
         sys.exit(f"error: ats_score {job['ats_score']} is below the threshold {THRESHOLD}")
     return job
 

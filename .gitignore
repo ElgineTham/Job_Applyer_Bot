@@ -28,3 +28,4 @@ Thumbs.db
 .job_links.lock
 .ats_passed.lock
 *.json.tmp
+job_history.json
