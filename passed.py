@@ -11,7 +11,11 @@ Usage:
   python3 passed.py add --any-score ... # test runs only: also accept scores below 75
 
 `add` keeps jobs sorted by ats_score (highest first), updates count and updated_at,
-and refuses a job below the threshold or without jobright_id / ats_score.
+and refuses a job below its pass line or without jobright_id / ats_score.
+
+Pass lines: 75 for most jobs. A job whose "target_company" field names a company in
+target_companies.json passes at that file's pass_line (45). The job's "company" must
+contain one of that company's listed names, or the job is refused.
 """
 import fcntl
 import json
@@ -23,6 +27,16 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 PASSED = os.path.join(HERE, "ats_passed.json")
 LOCK = os.path.join(HERE, ".ats_passed.lock")
 THRESHOLD = 75
+TARGETS_FILE = os.path.join(HERE, "target_companies.json")
+
+
+def load_targets():
+    with open(TARGETS_FILE) as f:
+        data = json.load(f)
+    return data["pass_line"], data["companies"]
+
+
+TARGET_THRESHOLD, TARGETS = load_targets()
 
 
 def now():
@@ -42,9 +56,10 @@ def load():
 def save(data):
     data["updated_at"] = now()
     data["threshold"] = THRESHOLD
+    data["target_threshold"] = TARGET_THRESHOLD
     data["jobs"].sort(key=lambda j: j.get("ats_score", 0), reverse=True)
     data["count"] = len(data["jobs"])
-    ordered = {k: data[k] for k in ("updated_at", "threshold", "count", "jobs")}
+    ordered = {k: data[k] for k in ("updated_at", "threshold", "target_threshold", "count", "jobs")}
     tmp = PASSED + ".tmp"
     with open(tmp, "w") as f:
         json.dump(ordered, f, indent=2, ensure_ascii=False)
@@ -64,8 +79,19 @@ def read_job():
         sys.exit("error: job JSON needs a jobright_id")
     if not isinstance(job.get("ats_score"), (int, float)):
         sys.exit("error: job JSON needs a numeric ats_score")
-    if job["ats_score"] < THRESHOLD and not ANY_SCORE:
-        sys.exit(f"error: ats_score {job['ats_score']} is below the threshold {THRESHOLD}")
+    line = THRESHOLD
+    target = job.get("target_company")
+    if target is not None:
+        if target not in TARGETS:
+            sys.exit(f"error: target_company {target!r} is not a key in target_companies.json "
+                     f"(use null for other companies)")
+        company = str(job.get("company", "")).lower()
+        if not any(name.lower() in company for name in TARGETS[target]):
+            sys.exit(f"error: company {job.get('company')!r} does not match any name listed "
+                     f"for {target!r} in target_companies.json")
+        line = TARGET_THRESHOLD
+    if job["ats_score"] < line and not ANY_SCORE:
+        sys.exit(f"error: ats_score {job['ats_score']} is below the pass line {line}")
     return job
 
 

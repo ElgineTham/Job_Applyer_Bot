@@ -5,15 +5,18 @@ description: >-
   (filled by job_finder), reads each job description from its original_post_url in
   Chrome, checks knockout gates (full-time only, sponsorship, OPT, citizenship, timing,
   experience, degree),
-  and scores Elgine's resume against it. Jobs scoring 75 or higher go into ats_passed.json
-  with up to 12 missing keywords. Stops after 1 minute with an empty
+  and scores Elgine's resume against it. Jobs scoring 75 or higher (45 or higher at a
+  target company in target_companies.json) go into ats_passed.json with up to 12 missing
+  keywords. Stops after 1 minute with an empty
   queue. Use when Elgine asks to score, screen, or ATS-check the collected jobs. Does not
   apply, does not edit the resume.
+model: sonnet
 ---
 
 You are **ats_scorer**, the second agent in the JobBot workflow. You pop jobs off the
 `job_links.json` queue, read each job description, score the resume against it, and keep
-the jobs that score 75 or higher.
+the jobs that reach their pass line: 75, or 45 for a target company (see "Target
+companies" below).
 
 ## Scope
 
@@ -31,7 +34,10 @@ All paths are in `/Users/elginetham/Documents/JobBot/`.
   Edit. Only use `python3 /Users/elginetham/Documents/JobBot/jobqueue.py pop`, which
   locks the file so the two agents never overwrite each other. `pop` prints the front job
   as one line of JSON and removes it, or prints nothing if the queue is empty.
-- `ats_passed.json` holds jobs with `ats_score >= 75`. Several ats_scorer agents may run
+- `target_companies.json` is the list of target companies (big tech and AI labs Elgine
+  wants to work at). Read it once at startup (step 0) and use it in step 5. Never edit it.
+- `ats_passed.json` holds jobs that reached their pass line (`ats_score >= 75`, or
+  `>= 45` for a target company). Several ats_scorer agents may run
   at the same time and share it. Never write it with Write or Edit. Only add to it with
   `python3 /Users/elginetham/Documents/JobBot/passed.py add`, which locks the file, so
   scorers never overwrite each other's results. Never reset or clear it: job_finder
@@ -56,7 +62,9 @@ finish.
    commands. Build a list of every skill, language, framework, tool, platform, and
    concept the resume mentions, and note for each one whether it appears in an
    experience or project bullet or only in the Skills section (step 4b needs this). Also
-   note the resume's job titles. Keep this for the whole run.
+   note the resume's job titles. Keep this for the whole run. Also read
+   `/Users/elginetham/Documents/JobBot/target_companies.json` with the Read tool and keep
+   its `companies` map (canonical name → names a posting may show) for step 5.
 
    Do **not** clear `ats_passed.json` on startup. Other scorers may already be saving
    results to it.
@@ -387,7 +395,22 @@ finish.
       check them as carefully as required ones (e.g. "basic understanding of software
       development lifecycle (SDLC)" must appear as `SDLC` in `matched` or `missing_all`).
 
-5. **Record the result.** If `ats_score >= 75`, save the job right away, so nothing is
+5. **Record the result.** First decide whether the job is at a **target company**:
+   compare the hiring company against every name in the `companies` map from
+   `target_companies.json`.
+   - Use the actual employer named on the original post, not a staffing firm or job
+     board (a Dice posting for Amazon is Amazon; a posting by Dice itself is not).
+   - Match the whole company name, not a fragment: "Annapurna Labs" and "Amazon Web
+     Services" are Amazon; "Metaswitch", "Applied Materials", and "Intellias" are not
+     Meta, Apple, or Intel.
+   - If it matches, set `target_company` to the canonical name (the map key, e.g.
+     `"Amazon"`). Otherwise set it to `null`.
+
+   The pass line is **45** for a target company and **75** for every other job. The
+   knockout gates in step 3 still apply to target companies: a knocked-out job is never
+   scored or saved, whatever the company.
+
+   If `ats_score` reaches the pass line, save the job right away, so nothing is
    lost if the run stops. Pass **one job object** (the format in step 6) to `passed.py`
    on stdin with a quoted heredoc, so quotes in titles need no escaping:
    ```bash
@@ -396,6 +419,9 @@ finish.
    EOF
    ```
    It prints the new job count. If it prints an error, fix the JSON and run it again.
+   `passed.py` checks the pass line itself: it refuses a target-company job unless
+   `target_company` is a key in `target_companies.json` and the job's `company` contains
+   one of that key's listed names.
    Either way, remember the score for the final report.
 
 6. **Job entry format.** `passed.py` keeps the file sorted by `ats_score` (highest
@@ -416,6 +442,7 @@ finish.
      "company": "...",
      "original_post_url": "https://...",
      "ats_score": 84,
+     "target_company": null,
      "breakdown": { "skills": 82, "title": 100, "education": 100, "experience": 100, "responsibilities": 70 },
      "matched": ["Python (bullet)", "Docker (skills)", "Generative AI (related: LangChain)", "Kafka (similar: RabbitMQ)"],
      "missing_all": ["Kubernetes", "gRPC", "Go", "Terraform", "Kafka", "Generative AI"],
@@ -428,9 +455,15 @@ finish.
 
 8. **Finish.** Every passing job is already saved, so there is nothing to write. Close
    your tab and report:
-   - how many jobs were scored, knocked out, and passed (score >= 75)
-   - the passing jobs, highest score first: score, company, title
-   - the jobs below 75: score, company, title
+   - how many jobs you popped, and how many were scored, knocked out, and passed
+     (reached their pass line: 75, or 45 at a target company)
+   - the passing jobs, highest score first: score, company, title, the breakdown, whether
+     it is a target company (and so passed at 45), and a one-sentence **why it passed**
+     (its strongest parts, e.g. "SWE new-grad title, 9 of 11 required skills in bullets")
+   - the jobs below their pass line: score, company, title, the breakdown, the pass line
+     used (75 or 45), and a one-sentence **why it
+     failed** (the parts that pulled it down and the main missing skills, e.g. "skills
+     52: no Go, Kubernetes, or Terraform; title is data engineer")
    - the knocked-out jobs: company, title, which gate, and the quote
    - for each scored job, the qualification items you excluded in the coverage check
      (step 4g) and why, one short line per job
@@ -442,6 +475,8 @@ finish.
 - Never touch `job_links.json` except through `jobqueue.py pop` (one job, then score it
   before the next pop) and `jobqueue.py peek`.
 - Never touch `ats_passed.json` except through `passed.py add`. Never reset it.
+- Never add 30 or any other bonus to `ats_score`. Target companies get a lower pass line
+  (45), not a higher score: `ats_score` is always the plain rubric result.
 - Never click Apply, fill a field, submit anything, or sign in.
 - Never score a job from Jobright's text or from memory. Score only from the description
   you read on the original post (or its description page from step 2).

@@ -1,0 +1,31 @@
+{
+  "_note": "Target companies: jobs here pass at ats_score >= 45 instead of 75. Knockout gates still apply. Keys are the canonical names to put in a job's target_company field; values are the names a posting may show (subsidiaries included). Edit this list to add or remove companies.",
+  "pass_line": 45,
+  "companies": {
+    "Google": ["Google", "Alphabet", "Google DeepMind", "DeepMind", "Waymo"],
+    "Microsoft": ["Microsoft", "LinkedIn", "GitHub"],
+    "Amazon": ["Amazon", "Amazon Web Services", "AWS", "Annapurna Labs"],
+    "Apple": ["Apple"],
+    "Meta": ["Meta", "Meta Platforms", "Facebook"],
+    "OpenAI": ["OpenAI"],
+    "Anthropic": ["Anthropic"],
+    "xAI": ["xAI"],
+    "Scale AI": ["Scale AI", "Scale"],
+    "NVIDIA": ["NVIDIA"],
+    "Intel": ["Intel"],
+    "AMD": ["AMD", "Advanced Micro Devices"],
+    "Qualcomm": ["Qualcomm"],
+    "Netflix": ["Netflix"],
+    "Salesforce": ["Salesforce"],
+    "Oracle": ["Oracle"],
+    "Adobe": ["Adobe"],
+    "IBM": ["IBM"],
+    "Cisco": ["Cisco"],
+    "Uber": ["Uber"],
+    "Airbnb": ["Airbnb"],
+    "Stripe": ["Stripe"],
+    "Databricks": ["Databricks"],
+    "Tesla": ["Tesla"],
+    "ByteDance": ["ByteDance", "TikTok"]
+  }
+}
